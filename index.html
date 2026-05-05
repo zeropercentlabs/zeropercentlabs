@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZERO PERCENT — Innovation Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080808;
+            --bg-elevated: #0d0d0d;
+            --bg-card: #111111;
+            --bg-card-hover: #161616;
+            --text-primary: #f0f0f0;
+            --text-secondary: #9a9a9a;
+            --text-muted: #555555;
+            --accent: #c8a45c;
+            --accent-hover: #d4b76a;
+            --accent-glow: rgba(200, 164, 92, 0.15);
+            --border: rgba(255,255,255,0.05);
+            --border-hover: rgba(200, 164, 92, 0.3);
+            --emerald: #2d9e6f;
+            --emerald-glow: rgba(45, 158, 111, 0.15);
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-weight: 400;
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        .noise {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+        .loader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1.5rem;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        .loader.hidden { opacity: 0; visibility: hidden; }
+        .loader-logo {
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeIn 0.6s ease 0.2s forwards;
+        }
+        .loader-logo span { color: var(--accent); }
+        .loader-tagline {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--text-muted);
+            opacity: 0;
+            animation: fadeIn 0.6s ease 0.5s forwards;
+        }
+        .loader-bar {
+            width: 140px;
+            height: 1px;
+            background: var(--border);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeIn 0.6s ease 0.3s forwards;
+        }
+        .loader-bar::after {
+            content: '';
+            position: absolute;
+            left: -100%;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--accent);
+            animation: loadSlide 1.2s ease-in-out infinite;
+        }
+        @keyframes loadSlide {
+            0% { left: -100%; }
+            50% { left: 0; }
+            100% { left: 100%; }
+        }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* NAVIGATION */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1.25rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(30px) saturate(1.2);
+            background: rgba(8, 8, 8, 0.75);
+            border-bottom: 1px solid var(--border);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease, background 0.4s ease;
+        }
+        nav.hidden-nav { transform: translateY(-100%); }
+        nav.scrolled {
+            padding: 0.875rem 3rem;
+            background: rgba(8, 8, 8, 0.92);
+            border-bottom-color: rgba(255,255,255,0.08);
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        .nav-brand-icon {
+            width: 36px;
+            height: 36px;
+            border: 1.5px solid var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        .nav-brand-text { display: flex; flex-direction: column; }
+        .nav-brand-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+        .nav-brand-tag {
+            font-size: 0.55rem;
+            font-weight: 500;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            line-height: 1.2;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+            list-style: none;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            position: relative;
+            padding: 0.25rem 0;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-primary); }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+        .nav-cta {
+            padding: 0.6rem 1.5rem;
+            background: var(--accent);
+            color: var(--bg);
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-cta:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px rgba(200, 164, 92, 0.25);
+        }
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .mobile-menu-btn span {
+            display: block;
+            width: 24px;
+            height: 1.5px;
+            background: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+        .page {
+            display: none;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .page.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 8rem 3rem 4rem;
+        }
+        .hero-mesh {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background: 
+                radial-gradient(ellipse 80% 50% at 70% 50%, rgba(200, 164, 92, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 30% 70%, rgba(45, 158, 111, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 60% at 80% 20%, rgba(100, 100, 150, 0.03) 0%, transparent 50%);
+            animation: meshShift 20s ease-in-out infinite;
+        }
+        @keyframes meshShift {
+            0%, 100% { background-position: 0% 0%, 0% 0%, 0% 0%; filter: hue-rotate(0deg); }
+            33% { background-position: 5% 5%, -5% 3%, 3% -5%; filter: hue-rotate(5deg); }
+            66% { background-position: -3% -3%, 5% -5%, -5% 5%; filter: hue-rotate(-5deg); }
+        }
+        .hero-zero {
+            position: absolute;
+            top: 50%;
+            left: 65%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-display);
+            font-size: clamp(15rem, 30vw, 25rem);
+            font-weight: 400;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(200, 164, 92, 0.12);
+            line-height: 1;
+            pointer-events: none;
+            user-select: none;
+            animation: heroFloat 8s ease-in-out infinite;
+        }
+        .hero-zero::after {
+            content: '%';
+            position: absolute;
+            top: 10%;
+            right: -15%;
+            font-size: 0.4em;
+            -webkit-text-stroke: 1px rgba(200, 164, 92, 0.18);
+        }
+        @keyframes heroFloat {
+            0%, 100% { transform: translate(-50%, -50%) translateY(0) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) translateY(-20px) rotate(1deg); }
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 650px;
+        }
+        .hero-eyebrow {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.4s forwards;
+        }
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 500;
+            line-height: 1.05;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.6s forwards;
+        }
+        .hero h1 .gold { color: var(--accent); font-style: italic; }
+        .hero-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            max-width: 480px;
+            margin-bottom: 2.5rem;
+            line-height: 1.8;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.8s forwards;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 1s forwards;
+        }
+
+        /* BUTTONS */
+        .btn-primary {
+            padding: 0.875rem 2rem;
+            background: var(--accent);
+            color: var(--bg);
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(200, 164, 92, 0.3);
+        }
+        .btn-primary .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: scale(0);
+            animation: rippleAnim 0.6s ease-out;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            to { transform: scale(4); opacity: 0; }
+        }
+        .btn-secondary {
+            padding: 0.875rem 2rem;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 4px;
+            border: 1px solid var(--border-hover);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-glow);
+        }
+        .btn-emerald {
+            padding: 0.875rem 2rem;
+            background: var(--emerald);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-emerald:hover {
+            background: #35b37d;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(45, 158, 111, 0.3);
+        }
+
+        /* SERVICE CARDS */
+        .home-services {
+            padding: 4rem 3rem 6rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .services-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        .service-card-home {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        .service-card-home::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .service-card-home:hover::before { opacity: 1; }
+        .service-card-home:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            transform: translateY(-6px) rotateX(2deg) rotateY(-2deg);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 40px rgba(200, 164, 92, 0.05);
+        }
+        .service-icon {
+            width: 48px;
+            height: 48px;
+            border: 1px solid var(--border-hover);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            color: var(--accent);
+            transition: all 0.3s ease;
+        }
+        .service-card-home:hover .service-icon {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+            transform: translateZ(20px);
+        }
+        .service-card-home h3 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            transition: transform 0.3s ease;
+        }
+        .service-card-home:hover h3 { transform: translateZ(15px); }
+        .service-card-home p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .service-card-home:hover p { transform: translateZ(10px); }
+        .service-link {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: gap 0.3s ease;
+        }
+        .service-link:hover { gap: 0.7rem; }
+
+        /* SECTIONS */
+        section {
+            padding: 6rem 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        .section-eyebrow {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+            font-weight: 500;
+            line-height: 1.15;
+        }
+        .section-title em { font-style: italic; color: var(--accent); }
+
+        /* ABOUT */
+        .about-hero {
+            min-height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding-top: 120px;
+            padding-bottom: 3rem;
+        }
+        .about-hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 500;
+            line-height: 1.15;
+        }
+        .about-hero h1 em { color: var(--accent); font-style: italic; }
+        .about-intro {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 1.5rem auto 0;
+            line-height: 1.8;
+        }
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        .about-image {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .about-image-placeholder {
+            font-family: var(--font-display);
+            font-size: 8rem;
+            color: rgba(200, 164, 92, 0.1);
+            font-weight: 400;
+        }
+        .about-text h3 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        .about-text p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+        .value-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .value-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+        }
+        .value-card h4 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .value-card p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* SERVICES */
+        .services-hero {
+            min-height: 45vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding-top: 120px;
+            padding-bottom: 2rem;
+        }
+        .services-hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 500;
+        }
+        .services-hero h1 em { color: var(--accent); font-style: italic; }
+        .service-detail {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            transition: all 0.4s ease;
+        }
+        .service-detail:hover { border-color: var(--border-hover); }
+        .service-detail-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .service-detail-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--accent-glow);
+            border: 1px solid var(--border-hover);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+        .service-detail h3 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .service-detail > p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+        .service-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        .service-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .service-feature::before {
+            content: '✓';
+            color: var(--accent);
+            font-weight: 700;
+        }
+        .afyalink-highlight {
+            background: linear-gradient(135deg, rgba(45, 158, 111, 0.08), rgba(200, 164, 92, 0.05));
+            border-color: rgba(45, 158, 111, 0.2);
+        }
+        .afyalink-highlight:hover { border-color: rgba(45, 158, 111, 0.4); }
+        .afyalink-highlight .service-detail-icon {
+            background: var(--emerald-glow);
+            color: var(--emerald);
+            border-color: rgba(45, 158, 111, 0.3);
+        }
+
+        /* AFYALINK */
+        .afya-hero {
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            padding: 8rem 3rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .afya-hero::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(45, 158, 111, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .afya-hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+        }
+        .afya-hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 500;
+            line-height: 1.15;
+            margin-bottom: 1rem;
+        }
+        .afya-hero h1 .emerald { color: var(--emerald); font-style: italic; }
+        .afya-tagline {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        .afya-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+        .afya-visual {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 400px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .afya-phone {
+            width: 220px;
+            height: 400px;
+            background: var(--bg-card);
+            border: 2px solid rgba(45, 158, 111, 0.3);
+            border-radius: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 60px rgba(45, 158, 111, 0.1);
+        }
+        .afya-phone::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 20px;
+            background: var(--bg);
+            border-radius: 10px;
+            z-index: 3;
+        }
+        .afya-phone-screen {
+            position: absolute;
+            inset: 35px 12px 20px;
+            background: var(--bg-elevated);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            overflow: hidden;
+        }
+        .afya-phone-screen::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(to bottom right, transparent 40%, rgba(45, 158, 111, 0.08) 50%, transparent 60%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%); }
+            100% { transform: translateX(100%) translateY(100%); }
+        }
+        .afya-qr {
+            width: 100px;
+            height: 100px;
+            background: var(--text-primary);
+            border-radius: 8px;
+            position: relative;
+            z-index: 2;
+        }
+        .afya-qr::after {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            background: var(--bg);
+            border-radius: 4px;
+        }
+        .afya-phone-label {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--emerald);
+            z-index: 2;
+        }
+        .afya-features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+        .afya-feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .afya-feature-card:hover {
+            border-color: var(--emerald);
+            background: var(--emerald-glow);
+            transform: translateY(-4px);
+        }
+        .afya-feature-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--emerald-glow);
+            border: 1px solid rgba(45, 158, 111, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.25rem;
+        }
+        .afya-feature-card h4 {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .afya-feature-card p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .vision-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 4rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+        .vision-section h2 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .vision-section h2 .emerald { color: var(--emerald); font-style: italic; }
+        .vision-section p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.8;
+        }
+        .vision-users {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+        .vision-user {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .vision-user-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--emerald-glow);
+            border: 1px solid rgba(45, 158, 111, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        .vision-user span {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+        .afya-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 3rem;
+        }
+
+        /* CONTACT */
+        .contact-hero {
+            min-height: 40vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding-top: 120px;
+        }
+        .contact-hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 500;
+        }
+        .contact-hero h1 em { color: var(--accent); font-style: italic; }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+        .contact-info h3 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .contact-info > p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .contact-item-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-glow);
+            border: 1px solid var(--border-hover);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+        .contact-item h4 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        .contact-item p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .social-links {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 2rem;
+        }
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        .social-link:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        /* Floating Label Form */
+        .contact-form {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem;
+        }
+        .form-group {
+            position: relative;
+            margin-bottom: 1.75rem;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem 1rem 0.75rem;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .form-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239a9a9a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+        .form-group select option {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .form-group label {
+            position: absolute;
+            left: 1rem;
+            top: 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            transform-origin: left top;
+        }
+        .form-group input:focus + label,
+        .form-group input:not(:placeholder-shown) + label,
+        .form-group textarea:focus + label,
+        .form-group textarea:not(:placeholder-shown) + label {
+            top: -0.6rem;
+            left: 0.75rem;
+            font-size: 0.6rem;
+            color: var(--accent);
+            background: var(--bg-card);
+            padding: 0 0.4rem;
+        }
+        .form-group select:focus + label,
+        .form-group select:has(option:checked:not([value=""])) + label {
+            top: -0.6rem;
+            left: 0.75rem;
+            font-size: 0.6rem;
+            color: var(--accent);
+            background: var(--bg-card);
+            padding: 0 0.4rem;
+        }
+        .form-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--accent);
+            color: var(--bg);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .form-submit:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(200, 164, 92, 0.3);
+        }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 4rem 3rem 3rem;
+        }
+        .footer-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        .footer-brand-block {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+        .footer-brand-icon {
+            width: 32px;
+            height: 32px;
+            border: 1.5px solid var(--accent);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        .footer-brand-text {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+        }
+        .footer-brand-text span { color: var(--accent); }
+        .footer-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            max-width: 280px;
+        }
+        .footer-newsletter {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .footer-newsletter input {
+            flex: 1;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.6rem 0.875rem;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        .footer-newsletter input:focus { border-color: var(--accent); }
+        .footer-newsletter input::placeholder { color: var(--text-muted); }
+        .footer-newsletter button {
+            padding: 0.6rem 1rem;
+            background: var(--accent);
+            color: var(--bg);
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .footer-newsletter button:hover { background: var(--accent-hover); }
+        .footer-col h4 {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+        }
+        .footer-col a {
+            display: block;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+        .footer-col a:hover { color: var(--accent); }
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-copy {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+        .footer-legal {
+            display: flex;
+            gap: 1.5rem;
+        }
+        .footer-legal a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.7rem;
+            transition: color 0.3s ease;
+        }
+        .footer-legal a:hover { color: var(--text-primary); }
+
+        /* ANIMATIONS */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .stagger-children > *:nth-child(1) { transition-delay: 0ms; }
+        .stagger-children > *:nth-child(2) { transition-delay: 80ms; }
+        .stagger-children > *:nth-child(3) { transition-delay: 160ms; }
+        .stagger-children > *:nth-child(4) { transition-delay: 240ms; }
+        .stagger-children > *:nth-child(5) { transition-delay: 320ms; }
+        .stagger-children > *:nth-child(6) { transition-delay: 400ms; }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .services-row { grid-template-columns: 1fr; }
+            .about-grid { grid-template-columns: 1fr; }
+            .contact-grid { grid-template-columns: 1fr; }
+            .afya-features-grid { grid-template-columns: repeat(2, 1fr); }
+            .afya-visual { display: none; }
+            .values-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            nav { padding: 1rem 1.5rem; }
+            .nav-links { display: none; }
+            .mobile-menu-btn { display: flex; }
+            .hero { padding: 7rem 1.5rem 3rem; }
+            section { padding: 4rem 1.5rem; }
+            .home-services { padding: 3rem 1.5rem; }
+            .hero-buttons { flex-direction: column; }
+            .afya-features-grid { grid-template-columns: 1fr; }
+            .vision-users { flex-direction: column; gap: 1.5rem; }
+            .afya-cta { flex-direction: column; }
+            .service-features { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+        }
+
+        /* MOBILE MENU */
+        .mobile-menu {
+            position: fixed;
+            inset: 0;
+            background: rgba(8, 8, 8, 0.98);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+        .mobile-menu.open { opacity: 1; visibility: visible; }
+        .mobile-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .mobile-menu a:hover { color: var(--accent); }
+        .mobile-menu-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    </style>
+<base target="_self">
+</head>
+<body>
+    <div class="noise"></div>
+
+    <div class="loader" id="loader">
+        <div class="loader-logo">ZERO <span>PERCENT</span></div>
+        <div class="loader-tagline">Innovation Laboratory</div>
+        <div class="loader-bar"></div>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-menu-close" onclick="toggleMobileMenu()">✕</button>
+        <a href="#" data-page="home" onclick="toggleMobileMenu()">Home</a>
+        <a href="#" data-page="about" onclick="toggleMobileMenu()">About</a>
+        <a href="#" data-page="services" onclick="toggleMobileMenu()">Services</a>
+        <a href="#" data-page="afyalink" onclick="toggleMobileMenu()">AfyaLink AI</a>
+        <a href="#" data-page="contact" onclick="toggleMobileMenu()">Contact</a>
+    </div>
+
+    <nav id="navbar">
+        <a href="#" class="nav-brand" data-page="home">
+            <div class="nav-brand-icon">0</div>
+            <div class="nav-brand-text">
+                <div class="nav-brand-name">Zero Percent</div>
+                <div class="nav-brand-tag">Innovation Lab</div>
+            </div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#" data-page="home" class="active">Home</a></li>
+            <li><a href="#" data-page="about">About</a></li>
+            <li><a href="#" data-page="services">Services</a></li>
+            <li><a href="#" data-page="afyalink">AfyaLink AI</a></li>
+            <li><a href="#" data-page="contact">Contact</a></li>
+        </ul>
+        <a href="#" class="nav-cta" data-page="contact">Get Started</a>
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+        <div class="hero">
+            <div class="hero-mesh"></div>
+            <div class="hero-zero">0</div>
+            <div class="hero-content">
+                <div class="hero-eyebrow">Innovation Laboratory</div>
+                <h1>Zero Limits.<br><span class="gold">Infinite Innovation.</span></h1>
+                <p class="hero-desc">ZERO PERCENT is an innovation lab delivering digital solutions, strategic consultation, and intelligent systems that create real impact for forward-thinking organizations.</p>
+                <div class="hero-buttons">
+                    <a href="#" class="btn-primary" data-page="services">Explore Services</a>
+                    <a href="#" class="btn-secondary" data-page="contact">Request Consultation</a>
+                </div>
+            </div>
+        </div>
+        <div class="home-services">
+            <div class="services-row stagger-children">
+                <div class="service-card-home reveal">
+                    <div class="service-icon">🌐</div>
+                    <h3>Website as a Service</h3>
+                    <p>Modern, responsive, and high-performance websites tailored to your goals. From design to deployment, we handle everything.</p>
+                    <a href="#" class="service-link" data-page="services">Learn More →</a>
+                </div>
+                <div class="service-card-home reveal">
+                    <div class="service-icon">💡</div>
+                    <h3>Consultation</h3>
+                    <p>Expert guidance in strategy, technology, and business growth. We help you make the right moves with confidence.</p>
+                    <a href="#" class="service-link" data-page="services">Learn More →</a>
+                </div>
+                <div class="service-card-home reveal">
+                    <div class="service-icon">🏥</div>
+                    <h3>AfyaLink AI</h3>
+                    <p>Instant access to patient records. Anywhere, anytime. Built for better healthcare delivery across Africa and beyond.</p>
+                    <a href="#" class="service-link" data-page="afyalink">Learn More →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="page" id="page-about">
+        <div class="about-hero">
+            <div>
+                <div class="hero-eyebrow">Our Story</div>
+                <h1>About <em>Us</em></h1>
+                <p class="about-intro">We turn ideas into intelligent solutions.</p>
+            </div>
+        </div>
+        <section>
+            <div class="about-grid reveal">
+                <div class="about-image">
+                    <div class="about-image-placeholder">0%</div>
+                </div>
+                <div class="about-text">
+                    <h3>An Innovation Lab Driven by Purpose</h3>
+                    <p>ZERO PERCENT is an innovation lab driven by creativity, technology, and purpose. We build digital products, platforms, and strategies that solve real problems and shape a better future.</p>
+                    <p>From powerful websites to smart healthcare systems like AfyaLink AI, we are committed to pushing boundaries and delivering solutions that matter.</p>
+                    <p>We believe in the power of zero — zero limits, zero excuses, and zero margin for mediocrity. Every project we undertake is an opportunity to redefine what is possible.</p>
+                </div>
+            </div>
+            <div class="section-header" style="margin-top: 5rem;">
+                <div class="section-eyebrow">What We Stand For</div>
+                <h2 class="section-title">Our Core <em>Values</em></h2>
+            </div>
+            <div class="values-grid stagger-children">
+                <div class="value-card reveal">
+                    <h4>Innovation</h4>
+                    <p>At the core of everything we do. We constantly explore new technologies and approaches.</p>
+                </div>
+                <div class="value-card reveal">
+                    <h4>Impact</h4>
+                    <p>Solutions that create real-world change. We measure success by the difference we make.</p>
+                </div>
+                <div class="value-card reveal">
+                    <h4>Integrity</h4>
+                    <p>Built on trust, transparency, and security. We hold ourselves to the highest standards.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="page" id="page-services">
+        <div class="services-hero">
+            <div>
+                <div class="hero-eyebrow">What We Do</div>
+                <h1>Our <em>Services</em></h1>
+                <p class="about-intro">Powerful solutions. Tailored for you.</p>
+            </div>
+        </div>
+        <section>
+            <div class="service-detail reveal">
+                <div class="service-detail-header">
+                    <div class="service-detail-icon">🌐</div>
+                    <div>
+                        <h3>Website as a Service</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">Custom websites that are modern, fast, secure, and built to convert.</p>
+                    </div>
+                </div>
+                <p>We design and develop custom websites that align with your brand and business objectives. From landing pages to complex web applications, our team delivers pixel-perfect, performance-optimized solutions.</p>
+                <div class="service-features">
+                    <div class="service-feature">Custom Design</div>
+                    <div class="service-feature">Responsive Development</div>
+                    <div class="service-feature">SEO Ready</div>
+                    <div class="service-feature">Deployment & Support</div>
+                </div>
+            </div>
+            <div class="service-detail reveal">
+                <div class="service-detail-header">
+                    <div class="service-detail-icon">💡</div>
+                    <div>
+                        <h3>Consultation</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">Strategic advice and technical guidance to help your business grow.</p>
+                    </div>
+                </div>
+                <p>Our consultation services cover business strategy, digital transformation, technology consulting, and planning. We work closely with you to understand your challenges and chart a clear path forward.</p>
+                <div class="service-features">
+                    <div class="service-feature">Business Strategy</div>
+                    <div class="service-feature">Digital Transformation</div>
+                    <div class="service-feature">Technology Consulting</div>
+                    <div class="service-feature">Planning & Roadmapping</div>
+                </div>
+            </div>
+            <div class="service-detail afyalink-highlight reveal">
+                <div class="service-detail-header">
+                    <div class="service-detail-icon">🏥</div>
+                    <div>
+                        <h3>AfyaLink AI</h3>
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">Secure digital access to patient records in seconds.</p>
+                    </div>
+                </div>
+                <p>AfyaLink AI is our flagship healthcare platform that enables medical professionals to access critical patient information instantly. Designed to eliminate delays and improve decision-making.</p>
+                <div class="service-features">
+                    <div class="service-feature">Instant Data Access</div>
+                    <div class="service-feature">Emergency Ready</div>
+                    <div class="service-feature">Secure & Compliant</div>
+                    <div class="service-feature">Built for Healthcare</div>
+                </div>
+                <div style="margin-top: 1.5rem;">
+                    <a href="#" class="service-link" data-page="afyalink">View Full Product →</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- AFYALINK -->
+    <div class="page" id="page-afyalink">
+        <div class="afya-hero">
+            <div class="afya-hero-content">
+                <div class="hero-eyebrow" style="color: var(--emerald);">Healthcare Innovation</div>
+                <h1>AfyaLink <span class="emerald">AI</span></h1>
+                <p class="afya-tagline">Instant Access to Patient Records — Anytime, Anywhere</p>
+                <p class="afya-desc">AfyaLink AI is a secure digital healthcare platform that enables medical professionals to access critical patient information instantly. Designed to eliminate delays and improve decision-making, AfyaLink AI ensures that the right data is available at the right time — saving lives and enhancing care delivery.</p>
+                <div class="hero-buttons">
+                    <a href="#" class="btn-emerald" onclick="showToast('Demo request submitted!'); return false;">Request a Demo</a>
+                    <a href="#" class="btn-secondary" onclick="showToast('Partnership inquiry sent!'); return false;">Partner With Us</a>
+                </div>
+            </div>
+            <div class="afya-visual">
+                <div class="afya-phone">
+                    <div class="afya-phone-screen">
+                        <div class="afya-qr"></div>
+                        <div class="afya-phone-label">Scan to Access</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section>
+            <div class="section-header reveal">
+                <div class="section-eyebrow" style="color: var(--emerald);">Platform Features</div>
+                <h2 class="section-title">Built for <em style="color: var(--emerald);">Healthcare</em></h2>
+            </div>
+            <div class="afya-features-grid stagger-children">
+                <div class="afya-feature-card reveal">
+                    <div class="afya-feature-icon">⚡</div>
+                    <h4>Instant Access</h4>
+                    <p>Get patient data in seconds with a simple scan.</p>
+                </div>
+                <div class="afya-feature-card reveal">
+                    <div class="afya-feature-icon">🚨</div>
+                    <h4>Emergency Ready</h4>
+                    <p>Built to support fast decisions when it matters.</p>
+                </div>
+                <div class="afya-feature-card reveal">
+                    <div class="afya-feature-icon">🔒</div>
+                    <h4>Secure & Reliable</h4>
+                    <p>Advanced encryption and strict access control.</p>
+                </div>
+                <div class="afya-feature-card reveal">
+                    <div class="afya-feature-icon">🏥</div>
+                    <h4>For Healthcare</h4>
+                    <p>Designed for hospitals, clinics, and responders.</p>
+                </div>
+            </div>
+            <div class="vision-section reveal">
+                <h2>Our Vision</h2>
+                <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;"><span class="emerald">One Patient. One Record. Anywhere.</span></h2>
+                <p>We are building a future where every individual has a unified and accessible medical record, connecting healthcare systems across Africa and beyond.</p>
+                <div class="vision-users">
+                    <div class="vision-user">
+                        <div class="vision-user-icon">🏥</div>
+                        <span>Hospitals</span>
+                    </div>
+                    <div class="vision-user">
+                        <div class="vision-user-icon">🩺</div>
+                        <span>Clinics</span>
+                    </div>
+                    <div class="vision-user">
+                        <div class="vision-user-icon">🚑</div>
+                        <span>Emergency</span>
+                    </div>
+                    <div class="vision-user">
+                        <div class="vision-user-icon">👨‍⚕️</div>
+                        <span>Providers</span>
+                    </div>
+                </div>
+            </div>
+            <div class="afya-cta reveal">
+                <a href="#" class="btn-emerald" onclick="showToast('Demo request submitted!'); return false;">Request a Demo</a>
+                <a href="#" class="btn-secondary" onclick="showToast('Partnership inquiry sent!'); return false;">Partner With Us</a>
+            </div>
+        </section>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="page" id="page-contact">
+        <div class="contact-hero">
+            <div>
+                <div class="hero-eyebrow">Get in Touch</div>
+                <h1>Contact <em>Us</em></h1>
+                <p class="about-intro">Let's build something great together.</p>
+            </div>
+        </div>
+        <section>
+            <div class="contact-grid">
+                <div class="contact-info reveal">
+                    <h3>Start a Conversation</h3>
+                    <p>Whether you have a specific project in mind or just want to explore possibilities, we would love to hear from you.</p>
+                    <div class="contact-item">
+                        <div class="contact-item-icon">✉</div>
+                        <div>
+                            <h4>Email</h4>
+                            <p>zeropercentlabs@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-item-icon">☎</div>
+                        <div>
+                            <h4>Phone</h4>
+                            <p>+254 718 618 972</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-item-icon">📍</div>
+                        <div>
+                            <h4>Location</h4>
+                            <p>Nairobi, Kenya</p>
+                        </div>
+                    </div>
+                    <div class="social-links">
+                        <a href="#" class="social-link" onclick="showToast('Coming soon!'); return false;">in</a>
+                        <a href="#" class="social-link" onclick="showToast('Coming soon!'); return false;">𝕏</a>
+                        <a href="#" class="social-link" onclick="showToast('Coming soon!'); return false;">f</a>
+                        <a href="https://instagram.com/zeropercentlabs" class="social-link" target="_blank" rel="noopener">ig</a>
+                    </div>
+                </div>
+                <div class="contact-form reveal">
+                    <form onsubmit="event.preventDefault(); showToast('Message sent successfully!'); this.reset();">
+                        <div class="form-group">
+                            <input type="text" id="contactName" placeholder=" " required>
+                            <label for="contactName">Your Name</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="contactEmail" placeholder=" " required>
+                            <label for="contactEmail">Email Address</label>
+                        </div>
+                        <div class="form-group">
+                            <select id="contactService" required>
+                                <option value="" selected></option>
+                                <option value="website">Website as a Service</option>
+                                <option value="consultation">Consultation</option>
+                                <option value="afyalink">AfyaLink AI</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <label for="contactService">Service of Interest</label>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="contactMessage" placeholder=" "></textarea>
+                            <label for="contactMessage">Your Message</label>
+                        </div>
+                        <button type="submit" class="form-submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand-block">
+                <a href="#" class="footer-brand" data-page="home">
+                    <div class="footer-brand-icon">0</div>
+                    <div class="footer-brand-text">Zero <span>Percent</span></div>
+                </a>
+                <p class="footer-desc">An innovation lab delivering digital solutions, strategic consultation, and intelligent systems that create real impact.</p>
+                <div class="footer-newsletter">
+                    <input type="email" placeholder="Your email" id="newsletterEmail">
+                    <button onclick="handleNewsletter()">Subscribe</button>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <a href="#" data-page="about">About Us</a>
+                <a href="#" data-page="services">Services</a>
+                <a href="#" data-page="afyalink">AfyaLink AI</a>
+                <a href="#" data-page="contact">Contact</a>
+            </div>
+            <div class="footer-col">
+                <h4>Services</h4>
+                <a href="#" data-page="services">Web Development</a>
+                <a href="#" data-page="services">Consultation</a>
+                <a href="#" data-page="afyalink">Healthcare AI</a>
+                <a href="#" data-page="services">Cloud Solutions</a>
+            </div>
+            <div class="footer-col">
+                <h4>Connect</h4>
+                <a href="#" onclick="showToast('Coming soon!'); return false;">LinkedIn</a>
+                <a href="#" onclick="showToast('Coming soon!'); return false;">Twitter / X</a>
+                <a href="https://instagram.com/zeropercentlabs" target="_blank" rel="noopener">Instagram</a>
+                <a href="#" onclick="showToast('Coming soon!'); return false;">Facebook</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-copy">© 2026 ZERO PERCENT Innovation Lab. All rights reserved.</div>
+            <div class="footer-legal">
+                <a href="#" onclick="showToast('Coming soon!'); return false;">Privacy Policy</a>
+                <a href="#" onclick="showToast('Coming soon!'); return false;">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toast" style="position: fixed; bottom: 2rem; right: 2rem; background: var(--accent); color: var(--bg); padding: 1rem 2rem; border-radius: 8px; font-size: 0.8rem; font-weight: 500; transform: translateY(120px); opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10001; box-shadow: 0 10px 40px rgba(0,0,0,0.4);"></div>
+
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1500);
+        });
+
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('open');
+        }
+
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            document.querySelectorAll('.nav-links a').forEach(a => {
+                a.classList.toggle('active', a.getAttribute('data-page') === pageId);
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(initReveals, 100);
+        }
+
+        document.querySelectorAll('[data-page]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                navigateTo(link.getAttribute('data-page'));
+            });
+        });
+
+        const navbar = document.getElementById('navbar');
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.scrollY;
+            navbar.classList.toggle('scrolled', currentScroll > 30);
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                navbar.classList.add('hidden-nav');
+            } else {
+                navbar.classList.remove('hidden-nav');
+            }
+            lastScroll = currentScroll;
+        });
+
+        function createRipple(e, btn) {
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple');
+            const rect = btn.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+            ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+            btn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        document.querySelectorAll('.btn-primary, .btn-emerald, .form-submit').forEach(btn => {
+            btn.addEventListener('click', (e) => createRipple(e, btn));
+        });
+
+        function initReveals() {
+            document.querySelectorAll('.reveal').forEach(el => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) entry.target.classList.add('visible');
+                    });
+                }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+                observer.observe(el);
+            });
+        }
+        initReveals();
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.transform = 'translateY(0)';
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.transform = 'translateY(120px)';
+                toast.style.opacity = '0';
+            }, 3000);
+        }
+
+        function handleNewsletter() {
+            const email = document.getElementById('newsletterEmail').value;
+            if (email && email.includes('@')) {
+                showToast('Subscribed successfully!');
+                document.getElementById('newsletterEmail').value = '';
+            } else {
+                showToast('Please enter a valid email');
+            }
+        }
+    </script>
+</body>
+</html>
